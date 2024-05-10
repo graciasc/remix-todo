@@ -14,14 +14,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
   session.set("counter", session.get("counter") || 0);
 
   if (counter && counter > 10) {
-    session.set("error", "You can't increment the counter anymore!");
-    return json({ error: "You can't increment the counter anymore!" });
+    const errorText = "You can't increment the counter anymore!";
+
+    return json({
+      error: errorText,
+      counter,
+    });
   }
 
   const data = {
     error: session.get("error"),
     counter: session.get("counter"),
   };
+
   return json(data, {
     headers: {
       "Set-Cookie": await commitSession(session),
@@ -30,11 +35,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  console.log({ request });
-  const session = await getSession(request.headers.get("Cookie"));
-  let counter = session.get("counter");
+  const formData = await request.formData();
+  const actionType = formData.get("action");
 
-  session.set("counter", (counter! += 1));
+  const session = await getSession(request.headers.get("Cookie"));
+  if (actionType === "INCREMENT") {
+    let counter = session.get("counter");
+    session.set("counter", (counter! += 1));
+  }
+  if (actionType === "DECREMENT") {
+    let counter = session.get("counter");
+    session.set("counter", (counter! -= 1));
+  }
+  if (actionType === "RESET") {
+    const counter = session.get("counter");
+    session.set("counter", 0);
+  }
 
   const headers = {
     "Set-Cookie": await commitSession(session),
@@ -43,17 +59,41 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 export default function Index() {
   const { error, counter } = useLoaderData<typeof loader>();
-  console.log({ error, counter });
   return (
     <div className="p-4 bg-black text-white h-full">
       {error ? (
-        <div> {error}</div>
+        <div className="">
+          <h1> {error}</h1>
+          <Form method="POST">
+            <button
+              name="action"
+              value="RESET"
+              className="rounded-md p-4 mt-2 bg-yellow-700"
+              type="submit"
+            >
+              Reset
+            </button>
+          </Form>
+        </div>
       ) : (
         <div>
           <p>Current count: {counter}</p>
-          <Form method="POST">
-            <button className="rounded-md p-4 bg-teal-700" type="submit">
+          <Form method="POST" className="space-x-2">
+            <button
+              name="action"
+              value="INCREMENT"
+              className="rounded-md p-4 bg-teal-700"
+              type="submit"
+            >
               Increment
+            </button>
+            <button
+              name="action"
+              value="DECREMENT"
+              className="rounded-md p-4 bg-red-700"
+              type="submit"
+            >
+              Decrement
             </button>
           </Form>
         </div>
