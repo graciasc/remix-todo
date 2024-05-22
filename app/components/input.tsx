@@ -4,17 +4,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { clsx } from "clsx";
 import React from "react";
 
-const inputVariants = cva(
-  "ring-1 ring-rose-500 focus:ring-rose-500 focus:ring-1",
-  {
-    variants: {
-      variant: {
-        primary: "ring-blue-500 focus:ring-blue-500 focus:ring-1",
-        default: "ring-rose-500 focus:ring-rose-500 focus:ring-1",
-      },
+const inputVariants = cva("ring-1 focus:ring-1", {
+  variants: {
+    variant: {
+      primary: "bring-blue-500 ring-blue-500 focus:ring-blue-500 focus:ring-1",
+      default: "ring-rose-500 focus:ring-rose-500 focus:ring-1",
     },
   },
-);
+});
 
 // explore types, generics and variants (components types that use html elements )
 // export interface InputProps
@@ -28,7 +25,7 @@ const Input = React.forwardRef<
   React.ElementRef<typeof FormPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof FormPrimitive.Root> &
     VariantProps<typeof inputVariants> & { asChild?: boolean }
->(({ className, variant, ...props }, ref) => {
+>(({ className, variant = "default", ...props }, ref) => {
   // why do we need as child here?
   // const Comp = asChild ? Slot : FormPrimitive;
   return (

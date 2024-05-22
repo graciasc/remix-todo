@@ -1,10 +1,9 @@
-//TODO: use the new input component and pass in asChild props
 import * as Form from "@radix-ui/react-form";
 
 import { Input } from "../../../components/input";
 export default function MortyIndex() {
   return (
-    <Input className="p-12">
+    <Input className="p-12" variant={"default"}>
       <Form.Field name="search" className="flex space-x-5">
         <div className="flex items-center">
           <Form.Label className="space-x-2 text-xl bold">Search</Form.Label>
