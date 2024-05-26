@@ -1,8 +1,16 @@
 import * as Form from "@radix-ui/react-form";
+import { LoaderFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
 import { Button } from "#app/components/button";
 import { Input } from "#app/components/input";
+import { loader as mortyLoader } from "#app/routes/resources+/morty.server"; // Import the loader
+
+export const loader: LoaderFunction = mortyLoader;
+
 export default function MortyIndex() {
+  const data = useLoaderData<typeof loader>();
+  console.log(data);
   return (
     <div>
       <Input className="p-12" variant={"default"}>
@@ -28,6 +36,7 @@ export default function MortyIndex() {
         </Form.Field>
       </Input>
       <Button className="m-4">Testing Button Component</Button>
+      {data.name}
     </div>
   );
 }
